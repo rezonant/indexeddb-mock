@@ -412,89 +412,93 @@ var mockIndexedDBDatabase = {
 
 var mockIndexedDBOpenDBRequest = {
 	callSuccessHandler: function () {
-		if (this.onsuccess) {
+		if (!this.onsuccess)
+			return;
 			
-			var event = {
-				'type' : 'success',
-				'bubbles' : false,
-				'cancelable' : true,
-				'target' : {
-					'result' : mockIndexedDBDatabase
-				}
-			};
-			
-			this.onsuccess(event);
-		}
+		var event = {
+			'type' : 'success',
+			'bubbles' : false,
+			'cancelable' : true,
+			'target' : {
+				'result' : mockIndexedDBDatabase
+			}
+		};
+
+		this.onsuccess(event);
 	},
 
 	callErrorHandler: function () {
-		if (this.onerror) {
-			var event = {
-				'type' : 'error',
-				'bubbles' : true,
-				'cancelable' : true,
-				'target' : {
-					'errorCode' : 1, // this is a made-up code
-					'error' : {
-						'message' : 'fail' // this is a made-up message
-					}
+		if (!this.onerror)
+			return;
+		
+		var event = {
+			'type' : 'error',
+			'bubbles' : true,
+			'cancelable' : true,
+			'target' : {
+				'errorCode' : 1, // this is a made-up code
+				'error' : {
+					'message' : 'fail' // this is a made-up message
 				}
-			};
-			this.onerror(event);
-		}
+			}
+		};
+		this.onerror(event);
 	},
 
 	callAbortHandler: function () {
-		if (this.onblocked) {
-			var event = {
-				'type' : 'error',
-				'bubbles' : true,
-				'cancelable' : true,
-				'target' : {
-					'errorCode' : 1, // this is a made-up code
-					'error' : {
-						'message' : 'fail' // this is a made-up message
-					}
+		if (!this.onblocked)
+			return;
+		
+		var event = {
+			'type' : 'error',
+			'bubbles' : true,
+			'cancelable' : true,
+			'target' : {
+				'errorCode' : 1, // this is a made-up code
+				'error' : {
+					'message' : 'fail' // this is a made-up message
 				}
-			};
-			this.onblocked(event);
-		}
+			}
+		};
+		this.onblocked(event);
 	},
 
 	callBlockedHandler: function () {
-		if (this.onabort) {
-			var event = {
-				'type' : 'error',
-				'bubbles' : true,
-				'cancelable' : true,
-				'target' : {
-					'errorCode' : 1, // this is a made-up code
-					'error' : {
-						'message' : 'fail' // this is a made-up message
-					}
+		if (!this.onabort)
+			return;
+		
+		var event = {
+			'type' : 'error',
+			'bubbles' : true,
+			'cancelable' : true,
+			'target' : {
+				'errorCode' : 1, // this is a made-up code
+				'error' : {
+					'message' : 'fail' // this is a made-up message
 				}
-			};
-			this.onabort(event);
-		}
+			}
+		};
+		this.onabort(event);
 	},
 
 	callUpgradeNeeded: function () {
-		if (this.onupgradeneeded) {
-			var event = {
-				'type' : 'upgradeneeded',
-				'bubbles' : false,
-				'cancelable' : true,
-				'target' : {
-					'result' : mockIndexedDBDatabase,
-					'transaction' : {
-						'abort': function () {
-							mockIndexedDBTestFlags.openDBShouldAbort = true;
-						}
+		if (!this.onupgradeneeded)
+			return;
+		
+		var event = {
+			'type' : 'upgradeneeded',
+			'bubbles' : false,
+			'cancelable' : true,
+			'target' : {
+				'result' : mockIndexedDBDatabase,
+				'transaction' : {
+					'abort': function () {
+						mockIndexedDBTestFlags.openDBShouldAbort = true;
 					}
 				}
-			};
-			this.onupgradeneeded(event);
-		}
+			}
+		};
+		this.onupgradeneeded(event);
 	},
 
 	result: mockIndexedDBDatabase
@@ -502,61 +506,64 @@ var mockIndexedDBOpenDBRequest = {
 
 var mockIndexedDBDeleteDBRequest = {
 	callSuccessHandler: function () {
-		if (this.onsuccess) {
-			var event = new CustomEvent("success", { bubbles: false, cancelable: true });
-			this.onsuccess(event);
-		}
+		if (!this.onsuccess)
+			return;
+		var event = new CustomEvent("success", { bubbles: false, cancelable: true });
+		this.onsuccess(event);
 	},
 
 	callErrorHandler: function () {
-		if (this.onerror) {
-			var event = {
-				'type' : 'error',
-				'bubbles' : true,
-				'cancelable' : true,
-				'target' : {
-					'errorCode' : 1, // this is a made-up code
-					'error' : {
-						'message' : 'fail' // this is a made-up message
-					}
+		if (!this.onerror)
+			return;
+		
+		var event = {
+			'type' : 'error',
+			'bubbles' : true,
+			'cancelable' : true,
+			'target' : {
+				'errorCode' : 1, // this is a made-up code
+				'error' : {
+					'message' : 'fail' // this is a made-up message
 				}
-			};
-			this.onerror(event);
-		}
+			}
+		};
+		this.onerror(event);
 	},
 
 	callAbortHandler: function () {
-		if (this.onblocked) {
-			var event = {
-				'type' : 'error',
-				'bubbles' : true,
-				'cancelable' : true,
-				'target' : {
-					'errorCode' : 1, // this is a made-up code
-					'error' : {
-						'message' : 'fail' // this is a made-up message
-					}
+		if (!this.onblocked)
+			return;
+		
+		var event = {
+			'type' : 'error',
+			'bubbles' : true,
+			'cancelable' : true,
+			'target' : {
+				'errorCode' : 1, // this is a made-up code
+				'error' : {
+					'message' : 'fail' // this is a made-up message
 				}
-			};
-			this.onblocked(event);
-		}
+			}
+		};
+		this.onblocked(event);
 	},
 
 	callBlockedHandler: function () {
-		if (this.onabort) {
-			var event = {
-				'type' : 'error',
-				'bubbles' : true,
-				'cancelable' : true,
-				'target' : {
-					'errorCode' : 1, // this is a made-up code
-					'error' : {
-						'message' : 'fail' // this is a made-up message
-					}
+		if (!this.onabort)
+			return;
+		
+		var event = {
+			'type' : 'error',
+			'bubbles' : true,
+			'cancelable' : true,
+			'target' : {
+				'errorCode' : 1, // this is a made-up code
+				'error' : {
+					'message' : 'fail' // this is a made-up message
 				}
-			};
-			this.onabort(event);
-		}
+			}
+		};
+		this.onabort(event);
 	},
 
 	'result' : {}
@@ -623,8 +630,8 @@ var mockIndexedDB = {
 				mockIndexedDB_deleteDBFail = true;
 			}, 20);
 		}
-
-		return mockIndexedDBDeleteDBRequest;
+ 
+		return mockIndexedDBDeleteDBRequest; 
 	}
 
 };
