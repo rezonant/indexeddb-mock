@@ -46,6 +46,52 @@ You can set flags to determine what features are enabled. Here's the defaults.
 ```
 
 Note that flags are reset to their defaults whenever `.reset()` is called.
+You will find descriptions of each flag below.
+
+## canOpenDB
+
+If true, the mock will respond to open() requests with success generally.
+If not true, the mock will "fail" to open the database.
+
+## openDBShouldBlock
+
+If true, the mock will respond to open() requests by blocking the application
+from continuing due to incompatible versions presently running.
+
+## openDBShouldAbort
+
+If true, the mock will respond to open() requests by aborting the open() process,
+triggering the onaborted event handler.
+
+## upgradeNeeded
+
+If true, the mock will respond to open() by triggering an onupgradeneeded event, before
+finally triggering onsuccess.
+
+## canReadDB
+
+If false, the mock will respond to IDBObjectStore.openCursor() by triggering an error condition as the database
+cannot be read.
+
+## canSave
+
+If false, the mock will respond to IDBObjectStore.put() by triggering an error condition.
+
+## canDelete
+
+If false, the mock will respond to IDBObjectStore.delete() by triggering an error condition.
+
+## canClear
+
+If false, the mock will respond to IDBObjectStore.clear() by triggering an error condition
+
+## canCreateStore
+
+If false, the mock will respond to IDBDatabase.createObjectStore() by triggering an error condition
+
+## canDeleteDB
+
+If false, the mock will respond to indexeddb.deleteDatabase() by triggering an error condition
 
 # License
 
