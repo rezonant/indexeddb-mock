@@ -13,6 +13,30 @@ describe('mock.open', function() {
 		};
 	});
 	
+	it('should upgrade from the specified version to the specified version', function(done) {
+		
+		idbMock.reset();
+		idbMock.flags.upgradeNeeded = true;
+		idbMock.flags.initialVersion = 3;
+		
+		var request = idbMock.mock.open('somedb', 5);
+		
+		request.onupgradeneeded = function(ev) {
+			expect(ev.oldVersion).toBe(3);
+			expect(ev.newVersion).toBe(5);
+			
+			done();
+		};
+		
+		request.onsuccess = function(ev) {
+			expect(true).toBe(false);
+		};
+		
+		request.onerror = function(ev) {
+			expect(true).toBe(false);
+		}
+	});
+	
 	it('should produce an IDBDatabase mock which has a name and version', function(done) {
 		idbMock.reset();
 		var request = idbMock.mock.open('somedb', 32);

@@ -34,6 +34,7 @@ var mockIndexedDBTestFlags = {
 	openDBShouldBlock: false,
 	openDBShouldAbort: false,
 	upgradeNeeded: false,
+	initialVersion: 1,
 	canReadDB: true,
 	canSave: true,
 	canDelete: true,
@@ -485,16 +486,22 @@ var mockIndexedDBOpenDBRequest = {
 		this.onabort(event);
 	},
 
-	callUpgradeNeeded: function () {
+	callUpgradeNeeded: function (version) {
 		if (!this.onupgradeneeded)
 			return;
 		
+		var db = JSON.parse(JSON.stringify(mockIndexedDBDatabase));		
+		db.name = name;
+		db.version = version;
+		console.log('doin it');
 		var event = {
 			'type' : 'upgradeneeded',
 			'bubbles' : false,
 			'cancelable' : true,
+			'oldVersion' : mockIndexedDBTestFlags.initialVersion,
+			'newVersion' : version,
 			'target' : {
-				'result' : mockIndexedDBDatabase,
+				'result' : db,
 				'transaction' : {
 					'abort': function () {
 						mockIndexedDBTestFlags.openDBShouldAbort = true;
@@ -598,7 +605,7 @@ var mockIndexedDB = {
 		}
 		else if (mockIndexedDBTestFlags.upgradeNeeded === true) {
 			mockIndexedDB_openDBTimer = setTimeout(function () {
-				mockIndexedDBOpenDBRequest.callUpgradeNeeded();
+				mockIndexedDBOpenDBRequest.callUpgradeNeeded(version);
 				mockIndexedDB_openDBUpgradeNeeded = true;
 			}, 20);
 		}
