@@ -411,7 +411,7 @@ var mockIndexedDBDatabase = {
 };
 
 var mockIndexedDBOpenDBRequest = {
-	callSuccessHandler: function () {
+	callSuccessHandler: function (name, version) {
 		if (!this.onsuccess)
 			return;
 
