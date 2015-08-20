@@ -131,6 +131,23 @@ describe('mock.open', function() {
 		};
 	});
 		
+	it('should provide a target/currentTarget when putting', function(done) {
+		
+		idbMock.reset();
+		
+		idbMock.mock.open('somedb', 5).onsuccess = function(ev) {
+			var db = ev.target.result;
+			var tx = db.transaction(['foo']);
+			var store = tx.objectStore('foo');
+			
+			store.put({}).onsuccess = function(ev) {
+				expect(ev.target).not.toBe(null);
+				expect(ev.currentTarget).not.toBe(null);
+				done();
+			};
+		};
+	});
+		
 	it('should upgrade from the specified version to the specified version', function(done) {
 		
 		idbMock.reset();
