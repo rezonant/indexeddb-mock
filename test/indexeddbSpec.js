@@ -13,6 +13,52 @@ describe('mock.open', function() {
 		};
 	});
 	
+	it('should provide target/currentTarget on upgrade', function(done) {
+		idbMock.reset();
+		idbMock.flags.upgradeNeeded = true;
+		idbMock.flags.initialVersion = 3;
+		
+		var request = idbMock.mock.open('somedb', 5);
+		
+		request.onupgradeneeded = function(ev) {
+			expect(ev.target).not.toBeNull();
+			expect(ev.currentTarget).not.toBeNull();
+			done();
+		};
+		
+		request.onsuccess = function(ev) {
+			expect(true).toBe(false);
+			done();
+		};
+		
+		request.onerror = function(ev) {
+			expect(true).toBe(false);
+			done();
+		};
+	});
+	
+	it('should provide target/currentTarget on success', function(done) {
+		idbMock.reset();
+		
+		var request = idbMock.mock.open('somedb', 5);
+		
+		request.onupgradeneeded = function(ev) {
+			expect(true).toBe(false);
+			done();
+		};
+		
+		request.onsuccess = function(ev) {
+			expect(ev.target).not.toBeNull();
+			expect(ev.currentTarget).not.toBeNull();
+			done();
+		};
+		
+		request.onerror = function(ev) {
+			expect(true).toBe(false);
+			done();
+		};
+	});
+		
 	it('should upgrade from the specified version to the specified version', function(done) {
 		
 		idbMock.reset();
@@ -30,10 +76,12 @@ describe('mock.open', function() {
 		
 		request.onsuccess = function(ev) {
 			expect(true).toBe(false);
+			done();
 		};
 		
 		request.onerror = function(ev) {
 			expect(true).toBe(false);
+			done();
 		}
 	});
 	
