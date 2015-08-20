@@ -16,13 +16,13 @@ describe('mock.open', function() {
 	it('should provide target/currentTarget on upgrade', function(done) {
 		idbMock.reset();
 		idbMock.flags.upgradeNeeded = true;
-		idbMock.flags.initialVersion = 3;
+		idbMock.flags.initialVersion = 3; 
 		
 		var request = idbMock.mock.open('somedb', 5);
 		
 		request.onupgradeneeded = function(ev) {
-			expect(ev.target).not.toBeNull();
-			expect(ev.currentTarget).not.toBeNull();
+			expect(ev.target).toBeDefined();
+			expect(ev.currentTarget).toBeDefined();
 			done();
 		};
 		
@@ -48,8 +48,8 @@ describe('mock.open', function() {
 		};
 		
 		request.onsuccess = function(ev) {
-			expect(ev.target).not.toBeNull();
-			expect(ev.currentTarget).not.toBeNull();
+			expect(ev.target).toBeDefined();
+			expect(ev.currentTarget).toBeDefined();
 			done();
 		};
 		

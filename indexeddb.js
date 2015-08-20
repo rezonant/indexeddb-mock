@@ -420,13 +420,16 @@ var mockIndexedDBOpenDBRequest = {
 		db.name = name;
 		db.version = version;
 				
+		var target = {
+			'result' : db
+		};
+		
 		var event = {
 			'type' : 'success',
 			'bubbles' : false,
 			'cancelable' : true,
-			'target' : {
-				'result' : db
-			}
+			'target' : target,
+			'currentTarget' : target
 		};
 
 		this.onsuccess(event);
@@ -493,20 +496,24 @@ var mockIndexedDBOpenDBRequest = {
 		var db = JSON.parse(JSON.stringify(mockIndexedDBDatabase));		
 		db.name = name;
 		db.version = version;
+		
+		var target = {
+			'result' : db,
+			'transaction' : {
+				'abort': function () {
+					mockIndexedDBTestFlags.openDBShouldAbort = true;
+				}
+			}
+		};
+		
 		var event = {
 			'type' : 'upgradeneeded',
 			'bubbles' : false,
 			'cancelable' : true,
 			'oldVersion' : mockIndexedDBTestFlags.initialVersion,
 			'newVersion' : version,
-			'target' : {
-				'result' : db,
-				'transaction' : {
-					'abort': function () {
-						mockIndexedDBTestFlags.openDBShouldAbort = true;
-					}
-				}
-			}
+			'target' : target,
+			'currentTarget' : target
 		};
 		this.onupgradeneeded(event);
 	},
