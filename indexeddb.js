@@ -414,13 +414,17 @@ var mockIndexedDBOpenDBRequest = {
 	callSuccessHandler: function () {
 		if (!this.onsuccess)
 			return;
-			
+
+		var db = JSON.parse(JSON.stringify(mockIndexedDBDatabase));		
+		db.name = name;
+		db.version = version;
+				
 		var event = {
 			'type' : 'success',
 			'bubbles' : false,
 			'cancelable' : true,
 			'target' : {
-				'result' : mockIndexedDBDatabase
+				'result' : db
 			}
 		};
 
@@ -603,7 +607,7 @@ var mockIndexedDB = {
 		// true state, so long as the other fail vars are checked first.
 		else if (mockIndexedDBTestFlags.canOpenDB === true) {
 			mockIndexedDB_openDBTimer = setTimeout(function () {
-				mockIndexedDBOpenDBRequest.callSuccessHandler();
+				mockIndexedDBOpenDBRequest.callSuccessHandler(dbname, version);
 				mockIndexedDB_openDBSuccess = true;
 			}, 20);
 		}
