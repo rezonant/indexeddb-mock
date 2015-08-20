@@ -83,6 +83,27 @@ describe('mock.open', function() {
 		};
 		
 	});
+	it('should store the authorized stores and mode of a new transaction', function(done) {
+		idbMock.reset();
+		
+		var request = idbMock.mock.open('somedb', 5);
+		var readyForSuccess = false;
+		
+		request.onsuccess = function(ev) {
+			
+			var db = ev.target.result;
+			var tx = db.transaction(['store1', 'store2'], 'readonlyX');
+			
+			expect(tx).not.toBe(null);
+			expect(tx._stores.length).toBe(2);
+			expect(tx._stores[0]).toBe('store1');
+			expect(tx._stores[1]).toBe('store2');
+			expect(tx._mode).toBe('readonlyX');
+			
+			done();
+		};
+		
+	});
 		
 	it('never reuses the open request (because that would be broken)', function() {
 		

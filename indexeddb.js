@@ -384,7 +384,11 @@ var mockIndexedDBTransaction = {
 
 var mockIndexedDBDatabase = {
 	transaction: function (stores, access) {
-		return mockIndexedDBTransaction;
+		var tx = lodash.clone(mockIndexedDBTransaction, true);
+		tx._stores = stores;
+		tx._mode = access;
+		
+		return tx;
 	},
 
 	close: function () {},
