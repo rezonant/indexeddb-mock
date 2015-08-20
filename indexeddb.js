@@ -493,7 +493,6 @@ var mockIndexedDBOpenDBRequest = {
 		var db = JSON.parse(JSON.stringify(mockIndexedDBDatabase));		
 		db.name = name;
 		db.version = version;
-		console.log('doin it');
 		var event = {
 			'type' : 'upgradeneeded',
 			'bubbles' : false,
