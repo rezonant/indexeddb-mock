@@ -12,5 +12,8 @@
   "bugs": {
     "url": "https://github.com/bevacqua/indexeddb-mock/issues"
   },
-  "homepage": "https://github.com/bevacqua/indexeddb-mock"
+  "homepage": "https://github.com/bevacqua/indexeddb-mock",
+  "dependencies": {
+    "lodash": "^3.10.1"
+  }
 }

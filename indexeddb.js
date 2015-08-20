@@ -2,6 +2,7 @@
 
 // mock saves objects here
 var mockIndexedDBItems = [];
+var lodash = require('lodash');
 
 // used for waitFor()'s in tests
 var mockIndexedDB_openDBSuccess = false;
@@ -92,6 +93,7 @@ function resetIndexedDBMock () {
   mockIndexedDBTestFlags.canClear = true;
 	mockIndexedDBTestFlags.canCreateStore = true;
 	mockIndexedDBTestFlags.canDeleteDB = true;
+	mockIndexedDBTestFlags.initialVersion = 1;
 
 	clearTimeout(mockIndexedDB_openDBTimer);
 	clearTimeout(mockIndexedDB_createObjectStoreTimer);
@@ -415,8 +417,7 @@ var mockIndexedDBOpenDBRequest = {
 	callSuccessHandler: function (name, version) {
 		if (!this.onsuccess)
 			return;
-
-		var db = JSON.parse(JSON.stringify(mockIndexedDBDatabase));		
+		var db = lodash.clone(mockIndexedDBDatabase, true);
 		db.name = name;
 		db.version = version;
 				
@@ -489,11 +490,11 @@ var mockIndexedDBOpenDBRequest = {
 		this.onabort(event);
 	},
 
-	callUpgradeNeeded: function (version) {
+	callUpgradeNeeded: function (name, version) {
 		if (!this.onupgradeneeded)
 			return;
 		
-		var db = JSON.parse(JSON.stringify(mockIndexedDBDatabase));		
+		var db = lodash.clone(mockIndexedDBDatabase, true);
 		db.name = name;
 		db.version = version;
 		
@@ -516,6 +517,20 @@ var mockIndexedDBOpenDBRequest = {
 			'currentTarget' : target
 		};
 		this.onupgradeneeded(event);
+		
+		var target = {
+			'result' : db
+		};
+		
+		var event = {
+			'type' : 'success',
+			'bubbles' : false,
+			'cancelable' : true,
+			'target' : target,
+			'currentTarget' : target
+		};
+
+		this.onsuccess(event);
 	},
 
 	result: mockIndexedDBDatabase
@@ -597,21 +612,23 @@ var mockIndexedDB = {
 
 	// note: the mock does not simulate separate stores, so dbname is ignored
 	open: function (dbname, version) {
+		var request = lodash.clone(mockIndexedDBOpenDBRequest, true);
+		
 		if (mockIndexedDBTestFlags.openDBShouldBlock === true) {
 			mockIndexedDB_openDBTimer = setTimeout(function () {
-				mockIndexedDBOpenDBRequest.callBlockedHandler();
+				request.callBlockedHandler();
 				mockIndexedDB_openDBBlocked = true;
 			}, 20);
 		}
 		else if (mockIndexedDBTestFlags.openDBShouldAbort === true) {
 			mockIndexedDB_openDBTimer = setTimeout(function () {
-				mockIndexedDBOpenDBRequest.callAbortHandler();
+				request.callAbortHandler();
 				mockIndexedDB_openDBAbort = true;
 			}, 20);
 		}
 		else if (mockIndexedDBTestFlags.upgradeNeeded === true) {
 			mockIndexedDB_openDBTimer = setTimeout(function () {
-				mockIndexedDBOpenDBRequest.callUpgradeNeeded(version);
+				request.callUpgradeNeeded(dbname, version);
 				mockIndexedDB_openDBUpgradeNeeded = true;
 			}, 20);
 		}
@@ -620,18 +637,18 @@ var mockIndexedDB = {
 		// true state, so long as the other fail vars are checked first.
 		else if (mockIndexedDBTestFlags.canOpenDB === true) {
 			mockIndexedDB_openDBTimer = setTimeout(function () {
-				mockIndexedDBOpenDBRequest.callSuccessHandler(dbname, version);
+				request.callSuccessHandler(dbname, version);
 				mockIndexedDB_openDBSuccess = true;
 			}, 20);
 		}
 		else {
 			mockIndexedDB_openDBTimer = setTimeout(function () {
-				mockIndexedDBOpenDBRequest.callErrorHandler();
+				request.callErrorHandler();
 				mockIndexedDB_openDBFail = true;
 			}, 20);
 		}
 
-		return mockIndexedDBOpenDBRequest;
+		return request;
 	},
 
 	deleteDatabase: function (dbname) {

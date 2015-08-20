@@ -19,16 +19,19 @@ describe('mock.open', function() {
 		idbMock.flags.initialVersion = 3; 
 		
 		var request = idbMock.mock.open('somedb', 5);
-		
+		var readyForSuccess = false;
 		request.onupgradeneeded = function(ev) {
+			readyForSuccess = true;
 			expect(ev.target).toBeDefined();
 			expect(ev.currentTarget).toBeDefined();
 			done();
 		};
 		
 		request.onsuccess = function(ev) {
-			expect(true).toBe(false);
-			done();
+			if (!readyForSuccess) {
+				expect(true).toBe(false);
+				done();
+			}
 		};
 		
 		request.onerror = function(ev) {
@@ -58,6 +61,39 @@ describe('mock.open', function() {
 			done();
 		};
 	});
+	
+	it('should provide call onsuccess after onupgradeneeded', function(done) {
+		idbMock.reset();
+		idbMock.flags.upgradeNeeded = true;
+		idbMock.flags.initialVersion = 3;
+		
+		var request = idbMock.mock.open('somedb', 5);
+		var readyForSuccess = false;
+		
+		request.onupgradeneeded = function(ev) {
+			readyForSuccess = true;
+		};
+		
+		request.onsuccess = function(ev) {
+			if (!readyForSuccess) {
+				expect(true).toBe(false);
+			}
+			
+			done();
+		};
+		
+	});
+		
+	it('never reuses the open request (because that would be broken)', function() {
+		
+		idbMock.reset();
+		
+		var request1 = idbMock.mock.open('somedb', 5);
+		var request2 = idbMock.mock.open('somedb', 5);
+		
+		expect(typeof request1.callSuccessHandler == 'function').toBe(true);
+		expect(request1).not.toBe(request2);
+	});
 		
 	it('should upgrade from the specified version to the specified version', function(done) {
 		
@@ -66,8 +102,10 @@ describe('mock.open', function() {
 		idbMock.flags.initialVersion = 3;
 		
 		var request = idbMock.mock.open('somedb', 5);
+		var readyForSuccess = false;
 		
 		request.onupgradeneeded = function(ev) {
+			readyForSuccess = true;
 			expect(ev.oldVersion).toBe(3);
 			expect(ev.newVersion).toBe(5);
 			
@@ -75,8 +113,10 @@ describe('mock.open', function() {
 		};
 		
 		request.onsuccess = function(ev) {
-			expect(true).toBe(false);
-			done();
+			if (!readyForSuccess) {
+				expect(true).toBe(false);
+				done();
+			}
 		};
 		
 		request.onerror = function(ev) {
