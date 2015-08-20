@@ -116,6 +116,21 @@ describe('mock.open', function() {
 		expect(request1).not.toBe(request2);
 	});
 		
+	it('should be successful when putting', function(done) {
+		
+		idbMock.reset();
+		
+		idbMock.mock.open('somedb', 5).onsuccess = function(ev) {
+			var db = ev.target.result;
+			var tx = db.transaction(['foo']);
+			var store = tx.objectStore('foo');
+			
+			store.put({}).onsuccess = function() {
+				done();
+			};
+		};
+	});
+		
 	it('should upgrade from the specified version to the specified version', function(done) {
 		
 		idbMock.reset();

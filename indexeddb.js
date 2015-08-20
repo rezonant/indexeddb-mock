@@ -394,6 +394,13 @@ var mockIndexedDBTransaction = {
 			var event = new CustomEvent("complete", { bubbles: false, cancelable: true });
 			this.oncomplete(event);
 		}
+		
+		// onsuccess is another event that IndexedDB provides here
+		
+		if (this.onsuccess) {
+			var event = new CustomEvent("success", { bubbles: false, cancelable: true });
+			this.onsuccess(event);
+		}
 	},
 
 	callErrorHandler: function () {
