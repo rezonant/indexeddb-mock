@@ -268,10 +268,13 @@ var mockIndexedDBStore = {
 
 	// for now, treating put just like an add.
 	// TODO: do an update instead of adding
-	put: function (data) {
+	put: function (data, key) {
 		var tx = lodash.clone(mockIndexedDBTransaction, true);
 		
-		this._itemsPut.push(data);
+		this._itemsPut.push({
+			key: key, 
+			item: data
+		});
 		
 		if (mockIndexedDBTestFlags.canSave === true) {
 			mockIndexedDBItems.push(data);
