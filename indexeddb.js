@@ -236,10 +236,19 @@ var mockIndexedDBStoreTransaction = {
 
 var mockIndexedDBStore = {
 	identity: 'mockedStore',
-
+	_itemsPut: [],
+	_itemsAdded: [],
+	_itemsDeleted: [],
+	_cleared: false,
+	_indexesCreated: [],
+	_cursorsOpened: [],
+	
 	// add returns a different txn than delete does. in indexedDB, the listeners are
 	// attached to the txn that returned the store.
-	add : function (data) {
+	add : function (data) { 
+		
+		this._itemsAdded.push(data);
+		
 		if (mockIndexedDBTestFlags.canSave === true) {
 			mockIndexedDBItems.push(data);
 			mockIndexedDB_storeAddTimer = setTimeout(function () {
@@ -260,25 +269,32 @@ var mockIndexedDBStore = {
 	// for now, treating put just like an add.
 	// TODO: do an update instead of adding
 	put: function (data) {
+		var tx = lodash.clone(mockIndexedDBTransaction, true);
+		
+		this._itemsPut.push(data);
+		
 		if (mockIndexedDBTestFlags.canSave === true) {
 			mockIndexedDBItems.push(data);
 			mockIndexedDB_storeAddTimer = setTimeout(function () {
-				mockIndexedDBTransaction.callCompleteHandler();
+				tx.callCompleteHandler();
 				mockIndexedDB_saveSuccess = true;
 			}, 20);
 		}
 		else {
 			mockIndexedDB_storeAddTimer = setTimeout(function () {
-				mockIndexedDBTransaction.callErrorHandler();
+				tx.callErrorHandler();
 				mockIndexedDB_saveFail = true;
 			}, 20);
 		}
 
-		return mockIndexedDBTransaction;
+		return tx;
 	},
 
 	// for delete, the listeners are attached to a request returned from the store.
 	delete: function (data_id) {
+		
+		this._itemsDeleted.push(data_id);
+		
 		if (mockIndexedDBTestFlags.canDelete === true) {
 			mockIndexedDB_storeDeleteTimer = setTimeout(function () {
 				mockIndexedDBStoreTransaction.callSuccessHandler();
@@ -297,6 +313,9 @@ var mockIndexedDBStore = {
 
 	// for clear, the listeners are attached to a request returned from the store.
 	clear: function (data_id) {
+		
+		this._cleared = true;
+		
 		if (mockIndexedDBTestFlags.canClear === true) {
 			mockIndexedDB_storeClearTimer = setTimeout(function () {
 				mockIndexedDBStoreTransaction.callSuccessHandler();
@@ -314,6 +333,7 @@ var mockIndexedDBStore = {
 	},
 
 	createIndex: function () {
+		this._indexesCreated.push(arguments);
 	},
 
 	callSuccessHandler: function () {
@@ -338,6 +358,9 @@ var mockIndexedDBStore = {
 	},
 
 	openCursor: function () {
+		
+		this._cursorsOpened.push(arguments);
+		
 		if (mockIndexedDBTestFlags.canReadDB === true) {
 			mockIndexedDB_storeOpenCursorTimer = setTimeout(function () {
 				mockIndexedDBCursorRequest.callSuccessHandler();
@@ -356,8 +379,14 @@ var mockIndexedDBStore = {
 };
 
 var mockIndexedDBTransaction = {
+	_stores: {},
+	
 	objectStore: function (name) {
-		return mockIndexedDBStore;
+		if (this._stores[name])
+			return this._stores[name];
+		
+		var store = lodash.clone(mockIndexedDBStore, true);
+		return this._stores[name] = store;
 	},
 
 	callCompleteHandler: function () {
