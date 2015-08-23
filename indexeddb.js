@@ -726,8 +726,90 @@ var mockIndexedDB = {
 };
 
 module.exports = {
-  reset: resetIndexedDBMock,
-  commit: commitIndexedDBMockData,
-  mock: mockIndexedDB,
-  flags: mockIndexedDBTestFlags
+	reset: resetIndexedDBMock,
+	commit: commitIndexedDBMockData,
+	mock: mockIndexedDB,
+	flags: mockIndexedDBTestFlags,
+	
+	request: {
+		error: function(items) {
+			var request = {
+				onsuccess: function() { },
+				onerror: function() { }
+			};
+
+			setTimeout(function() {
+				var shouldContinue = false;
+				var cursor = {
+					continue: function() {
+						shouldContinue = true;
+					}
+				}
+
+				var target = {
+					result: cursor
+				};
+
+				var event = {
+					target: target,
+					currentTarget: target
+				};
+
+				for (var i = 0, max = items.length; i < max; ++i) {
+					shouldContinue = false;
+					cursor.value = items[max];
+					request.onsuccess(event);
+
+					if (!shouldContinue)
+						break;
+				}
+				
+				target.result = null;
+				request.onerror({message:'error'});
+
+			}, 5);
+
+			return request;
+		},
+		
+		success: function(items) {
+			var request = {
+				onsuccess: function() { },
+				onerror: function() { }
+			};
+
+			setTimeout(function() {
+				var shouldContinue = false;
+				var cursor = {
+					continue: function() {
+						shouldContinue = true;
+					}
+				}
+
+				var target = {
+					result: cursor
+				};
+
+				var event = {
+					target: target,
+					currentTarget: target
+				}
+
+				for (var i = 0, max = items.length; i < max; ++i) {
+					shouldContinue = false;
+					cursor.value = items[max];
+					request.onsuccess(event);
+
+					if (!shouldContinue)
+						break;
+				}
+				
+				target.result = null;
+				request.onsuccess(event);
+
+			}, 5);
+
+			return request;
+		}
+	}
 };
