@@ -757,7 +757,7 @@ module.exports = {
 
 				for (var i = 0, max = items.length; i < max; ++i) {
 					shouldContinue = false;
-					cursor.value = items[max];
+					cursor.value = items[i];
 					request.onsuccess(event);
 
 					if (!shouldContinue)
@@ -783,7 +783,8 @@ module.exports = {
 				var cursor = {
 					continue: function() {
 						shouldContinue = true;
-					}
+					},
+					value: null
 				}
 
 				var target = {
@@ -797,7 +798,7 @@ module.exports = {
 
 				for (var i = 0, max = items.length; i < max; ++i) {
 					shouldContinue = false;
-					cursor.value = items[max];
+					cursor.value = items[i];
 					request.onsuccess(event);
 
 					if (!shouldContinue)
