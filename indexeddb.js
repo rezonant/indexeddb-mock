@@ -772,11 +772,26 @@ module.exports = {
 			return request;
 		},
 		
-		success: function(items) {
+		success: function(items, single) {
 			var request = {
 				onsuccess: function() { },
 				onerror: function() { }
 			};
+
+			if (single) {
+				setTimeout(function() {
+					var target = {
+						result: items
+					}
+					var ev = {
+						target: target,
+						currentTarget: target
+					};
+					request.onsuccess(ev);
+				}, 1);
+				
+				return request;
+			}
 
 			setTimeout(function() {
 				var shouldContinue = false;
@@ -794,21 +809,35 @@ module.exports = {
 				var event = {
 					target: target,
 					currentTarget: target
-				}
-
+				} 
+ 
+				var promise = Promise.resolve(0);
+				
 				for (var i = 0, max = items.length; i < max; ++i) {
-					shouldContinue = false;
-					cursor.value = items[i];
-					request.onsuccess(event);
+					promise = promise.then(function(i) {
+						return new Promise(function(resolve, reject) {
+							shouldContinue = false;
+							cursor.value = items[i];
+							request.onsuccess(event);
 
-					if (!shouldContinue)
-						break;
+							if (!shouldContinue) {
+								reject();
+								return;
+							} 
+							
+							setTimeout(function() {
+								resolve(i + 1);
+							}, 1); 
+						});
+					});
 				}
 				
-				target.result = null;
-				request.onsuccess(event);
-
-			}, 5);
+				promise.then(function() {
+					target.result = null;
+					request.onsuccess(event);
+				});
+				
+			}, 1);
 
 			return request;
 		}
