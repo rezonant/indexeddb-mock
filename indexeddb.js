@@ -795,9 +795,11 @@ module.exports = {
 
 			setTimeout(function() {
 				var shouldContinue = false;
+				var continueIterating = null;
+
 				var cursor = {
 					continue: function() {
-						shouldContinue = true;
+						continueIterating();
 					},
 					value: null
 				}
@@ -816,18 +818,9 @@ module.exports = {
 				for (var i = 0, max = items.length; i < max; ++i) {
 					promise = promise.then(function(i) {
 						return new Promise(function(resolve, reject) {
-							shouldContinue = false;
 							cursor.value = items[i];
+							continueIterating = resolve;
 							request.onsuccess(event);
-
-							if (!shouldContinue) {
-								reject();
-								return;
-							} 
-							
-							setTimeout(function() {
-								resolve(i + 1);
-							}, 1); 
 						});
 					});
 				}
