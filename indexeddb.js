@@ -819,7 +819,7 @@ module.exports = {
 					promise = promise.then(function(i) {
 						return new Promise(function(resolve, reject) {
 							cursor.value = items[i];
-							continueIterating = resolve;
+							continueIterating = function() { resolve(i + 1); };
 							request.onsuccess(event);
 						});
 					});
