@@ -794,12 +794,17 @@ module.exports = {
 			}
 
 			setTimeout(function() {
-				var shouldContinue = false;
-				var continueIterating = null;
+				var resolveContinue = null;
 
 				var cursor = {
 					continue: function() {
-						continueIterating();
+						if (!resolveContinue) {
+							console.warn('IDB mock: called continue() before next result (or called continue() multiple times)');
+							return;
+						}
+
+						resolveContinue();
+						resolveContinue = null;
 					},
 					value: null
 				}
@@ -819,7 +824,11 @@ module.exports = {
 					promise = promise.then(function(i) {
 						return new Promise(function(resolve, reject) {
 							cursor.value = items[i];
-							continueIterating = function() { resolve(i + 1); };
+
+							resolveContinue = function() {
+								resolve(i + 1);
+							};
+
 							request.onsuccess(event);
 						});
 					});
@@ -828,6 +837,9 @@ module.exports = {
 				promise.then(function() {
 					target.result = null;
 					request.onsuccess(event);
+				}).catch(function(e) { 
+					console.error('IDB mock: caught exception:');
+					console.error(e);
 				});
 				
 			}, 1);
